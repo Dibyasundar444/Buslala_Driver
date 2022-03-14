@@ -11,24 +11,23 @@ import Feather from 'react-native-vector-icons/Feather';
 
 import { fontColor, primary } from "../utils/Color";
 import MyCard from "../utils/MyCard";
+import Background from "../utils/Background";
+import Header from "../utils/Header";
 
-export default function BusesScreen(){
+export default function BusesScreen({navigation}){
     return(
         <View style={styles.container}>
-            <View style={styles.headerContainer} />
+            <Background 
+                BACKCOLOR={primary}
+                HEIGHT="40%"
+                borderBottomLeftRadius={200}
+                borderBottomRightRadius={200}
+                scaleX={2}
+            />
             <View style={styles.body}>
-                <View style={styles.header}>
-                    <TouchableOpacity
-                        style={styles.person}
-                    >
-                        <Octicons name="person" color="#fff" size={22} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.person}
-                    >
-                        <Feather name="bell" color="#fff" size={22} />
-                    </TouchableOpacity>
-                </View>
+                <Header 
+                    isPerson={true}
+                />
                 <View
                     style={{width:'100%'}}
                 >
@@ -41,7 +40,9 @@ export default function BusesScreen(){
                         contentContainerStyle={{paddingHorizontal:15,paddingBottom:300}}
                         showsVerticalScrollIndicator={false}
                     >
-                        <MyCard />
+                        <MyCard 
+                            NAV={()=>navigation.navigate('TodaysTrip')}
+                        />
                         <MyCard />
                         <MyCard />
                         <MyCard />
@@ -58,15 +59,6 @@ const styles = StyleSheet.create({
         flex:1,
         backgroundColor:"#fff"
     },
-    headerContainer: {
-        backgroundColor: primary,
-        height: "41%",
-        borderBottomLeftRadius:200,
-        borderBottomRightRadius:200,
-        transform: [
-            {scaleX: 2}
-        ]
-    },
     body: {
         position:"absolute",
         top:0,
@@ -75,21 +67,5 @@ const styles = StyleSheet.create({
         left:0,
         backgroundColor:"transparent",
         alignItems:"center"
-    },
-    header: {
-        flexDirection:'row',
-        justifyContent:"space-between",
-        alignItems:"center",
-        width:"90%",
-        marginTop:50,
-        marginBottom:30
-    },
-    person: {
-        justifyContent:"center",
-        alignItems:"center",
-        height:50,
-        width:50,
-        borderRadius:25,
-        backgroundColor:'rgba(0,0,0,0.3)'
     },
 })
