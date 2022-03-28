@@ -10,7 +10,7 @@ import {
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import { secondary, fontColor } from "../utils/Color";
+import { secondary, fontColor } from "./Color";
 import St_Line from "./St_Line";
 
 const DUMMYDATA_UPPER=[{id:0,status:0},{id:1,status:1},{id:2,status:0},{id:3,status:1},{id:4,status:0},
@@ -27,7 +27,9 @@ const DUMMYDATA_LOWER=[{id:0,status:0},{id:1,status:1},{id:2,status:0},{id:3,sta
     {id:35,status:0},{id:36,status:0},{id:37,status:0},{id:38,status:0},{id:39,status:0}
 ];
 
-export default function MyCard({NAV,isSeat}){
+export default function TripCard(
+    {bus_model,bus_name,total_seat}
+){
 
     const [lowerSeats, setLowerSeats] = useState(DUMMYDATA_LOWER);
     const [upperSeats, setUpperSeats] = useState(DUMMYDATA_UPPER);
@@ -98,6 +100,7 @@ export default function MyCard({NAV,isSeat}){
                     </View>
                 </View>
                 <View style={{alignItems:"center",marginVertical:120,marginHorizontal:5}}>
+                    {/* <Text style={{color:"#000",fontSize:12,textAlign:"center"}}>L{`\n`}O{`\n`}W{`\n`}E{`\n`}R</Text> */}
                     <Text style={{color:"#000",fontSize:12}}>L</Text>
                     <Text style={{color:"#000",fontSize:12}}>O</Text>
                     <Text style={{color:"#000",fontSize:12}}>W</Text>
@@ -118,10 +121,8 @@ export default function MyCard({NAV,isSeat}){
 
 
     return(
-        <TouchableOpacity 
+        <View 
             style={styles.card}
-            activeOpacity={1}
-            onPress={NAV}
         >
             <View
                 style={{
@@ -132,8 +133,18 @@ export default function MyCard({NAV,isSeat}){
                 }}
             >
                 <View>
-                    <Text style={{color:"#000",letterSpacing:1,fontSize:13,fontWeight:"500"}}>Company Name Travels</Text>
-                    <Text style={{color:"gray",fontSize:11}}>AC Seater / Sleeper (2+1)</Text>
+                    <Text 
+                        style={{
+                            color:"#000",
+                            letterSpacing:1,
+                            fontSize:13,
+                            fontWeight:"500",
+                            left:-15,
+                            textTransform:"capitalize"
+                        }}
+                    >   {bus_name}
+                    </Text>
+                    <Text style={{color:"gray",fontSize:11}}>{bus_model}</Text>
                     <Text style={{color:"#000",fontSize:11}}>20 Oct, Friday</Text>
                 </View>
                 <View style={{alignItems:"center"}}>
@@ -175,68 +186,46 @@ export default function MyCard({NAV,isSeat}){
                 <View style={{alignItems:"center"}}>
                     <View style={{flexDirection:"row",alignItems:"center"}}>
                         <Text style={{color:"#000",fontSize:16,fontWeight:"500"}}>33</Text>
-                        <Text style={{color:"#000",fontSize:12}}> out of 46</Text>
+                        <Text style={{color:"#000",fontSize:12}}> out of {total_seat}</Text>
                     </View>
                     <Text style={{color:"#000",fontSize:11}}>13 seats left</Text>
                 </View>
             </View>
-            {
-                isSeat &&
-                <>
-                    <View
+            <View
+                style={{
+                    flexDirection:"row",
+                    alignItems:"center",
+                    justifyContent:"space-between",
+                    marginTop:15
+                }}
+            >
+                <Lower />
+                <St_Line 
+                    height="95%"
+                    borderWidth={0.6}
+                    borderColor="#aaa"
+                    backgroundColor="#aaa"
+                    top={-10}
+                />
+                <Upper />
+            </View>
+            <View style={{alignItems:"center"}}>
+                <TouchableOpacity
+                    style={styles.btn}
+                    activeOpacity={0.8}
+                >
+                    <Text 
                         style={{
-                            flexDirection:"row",
-                            alignItems:"center",
-                            justifyContent:"space-between",
-                            marginTop:15
+                            color:"#fff",
+                            letterSpacing:1,
+                            fontWeight:"500"
                         }}
                     >
-                        <Lower />
-                        <St_Line 
-                            height="95%"
-                            borderWidth={0.6}
-                            borderColor="#aaa"
-                            backgroundColor="#aaa"
-                            top={-10}
-                        />
-                        <Upper />
-                    </View>
-                    <View style={{alignItems:"center"}}>
-                        <TouchableOpacity
-                            style={styles.btn}
-                            activeOpacity={0.8}
-                        >
-                            <Text 
-                                style={{
-                                    color:"#fff",
-                                    letterSpacing:1,
-                                    fontWeight:"500"
-                                }}
-                            >
-                                Start Trip
-                            </Text>
-                        </TouchableOpacity>
-                        <View 
-                            style={{
-                                alignItems:"flex-end",
-                                flexDirection:"row",
-                                marginVertical:10
-                            }}
-                        >
-                            <Ionicons name="alarm-outline" color="#000" size={20} />
-                            <View style={{marginLeft:10,top:-2}}>
-                                <Text style={styles.remainderTxt}>Set Remainder</Text>
-                                <St_Line 
-                                    borderWidth={0.6}
-                                    borderColor="#000"
-                                    backgroundColor="#000"
-                                />
-                            </View>
-                        </View>
-                    </View>
-                </>
-            }
-        </TouchableOpacity>
+                        Start Trip
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        </View>
     );
 }
 
@@ -268,7 +257,8 @@ const styles = StyleSheet.create({
         justifyContent:"center",
         alignItems:"center",
         borderRadius:10,
-        paddingVertical:8
+        paddingVertical:8,
+        marginBottom:10
     },
     remainderTxt: {
         color:"#000",

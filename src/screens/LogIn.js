@@ -1,4 +1,6 @@
-import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,13 +9,67 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  KeyboardAvoidingView
+  ActivityIndicator
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { BASE_URL } from '../config';
 import { primary, secondary } from '../utils/Color';
 
 export default function LogIn({navigation}){
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading1, setLoading1] = useState(false);
+  const [input1Error, setInput1Error] = useState(false);
+  const [input2Error, setInput2Error] = useState(false);
+  const [userErrorText, setUserErrortext] = useState('');
+  const [serverError, setServerError] = useState(false);
+
+  const errorHandler1=()=>{
+    if(!email){
+      setInput1Error(true);
+    }
+    else setInput1Error(false);
+  };
+  const errorHandler2=()=>{
+    if(!email){
+      setInput2Error(true);
+    }
+    else setInput2Error(false);
+  };
+
+  const LOGIN = () => {
+    setLoading1(true);
+    let body = {
+      "email": email,
+      "password": password
+    }
+    axios.post(`${BASE_URL}/api/admin/driverLogin`,body)
+    .then(async resp=>{
+      setLoading1(false);
+      await AsyncStorage.setItem('user',JSON.stringify(resp.data));
+      navigation.navigate("Buses");
+    })
+    .catch(err=>{
+      setLoading1(false);
+      if(err.response.data.message){
+        setUserErrortext(err.response.data.message);
+        setServerError(false);
+      }
+      else {
+        setServerError(true);
+        setUserErrortext('');
+      }
+        console.log("server err",err);
+    })
+  };
+
+  const ErrorInput=({text})=>(
+    <Text style={{color:"red",fontSize:11,textAlign:"center",marginTop:5}}>{text}</Text>
+  );
+
+
   return(
     <View style={styles.container}>
       <View style={styles.logo}>
@@ -39,9 +95,15 @@ export default function LogIn({navigation}){
                 placeholder='Enter your Id'
                 placeholderTextColor="gray"
                 style={styles.textInput}
+                value={email}
+                onChangeText={(val)=>setEmail(val)}
+                onBlur={errorHandler1}
               />
             </View>
-            <Text style={{color:"#000",marginTop:20,fontSize:13}}>Password</Text>
+            {
+              input1Error && <ErrorInput text="Please enter your ID" />
+            }
+            <Text style={{color:"#000",marginTop:input1Error?0:20,fontSize:13}}>Password</Text>
             <View style={styles.inputView}>
               <MaterialCommunityIcons 
                 name='form-textbox-password' 
@@ -53,16 +115,32 @@ export default function LogIn({navigation}){
                 placeholder='Enter your Password'
                 placeholderTextColor="gray"
                 style={styles.textInput}
+                value={password}
+                onChangeText={(val)=>setPassword(val)}
+                onBlur={errorHandler2}
               />
             </View>
+            {
+              input2Error && <ErrorInput text="Please enter Password" />
+            }
           </View>
           <TouchableOpacity
             style={styles.btn}
             activeOpacity={0.8}
-            onPress={()=>navigation.navigate("Buses")}
+            onPress={LOGIN}
           >
-            <Text style={styles.submitText}>Login</Text>
+            {
+              loading1 ? <ActivityIndicator size={26} color="#fff" /> : <Text style={styles.submitText}>Login</Text>
+            }
           </TouchableOpacity>
+          <View style={{marginBottom:10}}>
+            {
+              serverError && <ErrorInput text={`Error from server\nPlease try again later`} />
+            }
+            {
+              userErrorText !=="" && <ErrorInput text={userErrorText} />
+            }
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -118,7 +196,7 @@ const styles = StyleSheet.create({
   btn: {
     width: "50%",
     backgroundColor: secondary,
-    marginVertical:40,
+    marginTop:40,
     alignItems:"center",
     justifyContent:"center",
     paddingVertical:10,

@@ -1,20 +1,56 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
     TouchableOpacity,
     StyleSheet,
-    ScrollView
+    ScrollView,
+    ActivityIndicator
 } from "react-native";
 import Octicons from 'react-native-vector-icons/Octicons';
 import Feather from 'react-native-vector-icons/Feather';
 
 import { fontColor, primary } from "../utils/Color";
-import MyCard from "../utils/MyCard";
 import Background from "../utils/Background";
 import Header from "../utils/Header";
+import axios from "axios";
+import { BASE_URL } from "../config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import BusesCard from "../utils/BusesCard";
 
 export default function BusesScreen({navigation}){
+
+    const [userData, setUserData] = useState({});
+    const [busData, setBusData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [apiError, setApiError] = useState(false);
+
+    useEffect(()=>{
+        getAllBusDetails();
+    },[]);
+
+
+    const getAllBusDetails=async()=>{
+        const USER_OBJ = await AsyncStorage.getItem('user');
+        const PARSED_OBJ = JSON.parse(USER_OBJ);
+        setUserData(PARSED_OBJ.user);
+        let axiosConfig = {
+            headers:{
+                Authorization: PARSED_OBJ.token
+            }
+        };
+        axios.get(`${BASE_URL}/api/admin/busDetails`,axiosConfig)
+        .then(resp=>{
+            setBusData(resp.data.data);
+            setLoading(false);
+        })
+        .catch(err=>{
+            setApiError(true);
+            console.log("server err: ",err);
+        })
+    };
+
+
     return(
         <View style={styles.container}>
             <Background 
@@ -27,26 +63,39 @@ export default function BusesScreen({navigation}){
             <View style={styles.body}>
                 <Header 
                     isPerson={true}
+                    account={()=>navigation.navigate("ProfileScreen")}
+                    bell={()=>navigation.navigate("NotificationPage")}
                 />
                 <View
                     style={{width:'100%'}}
                 >
-                    <View style={{marginLeft:20}}>
-                        <Text style={{fontSize:22,color:"#fff",letterSpacing:1}}>Hello</Text>
-                        <Text style={{fontSize:26,color:fontColor,letterSpacing:1}}>Sampath!</Text>
-                        <Text style={{color:"#fff",marginVertical:10}}>Where are you heading today?</Text>
-                    </View>
                     <ScrollView 
-                        contentContainerStyle={{paddingHorizontal:15,paddingBottom:300}}
+                        contentContainerStyle={{paddingHorizontal:15,paddingBottom:250}}
                         showsVerticalScrollIndicator={false}
                     >
-                        <MyCard 
-                            NAV={()=>navigation.navigate('TodaysTrip')}
-                        />
-                        <MyCard />
-                        <MyCard />
-                        <MyCard />
-                        <MyCard />
+                        <View style={{marginLeft:20}}>
+                            <Text style={{fontSize:22,color:"#fff",letterSpacing:1}}>Hello</Text>
+                            <Text style={{fontSize:26,color:fontColor,letterSpacing:1,textTransform:"capitalize"}}>{userData.name}!</Text>
+                            <Text style={{color:"#fff",marginVertical:10}}>Where are you heading today?</Text>
+                        </View>   
+                        {
+                            loading ? <ActivityIndicator size={40} style={{marginTop:80}} />
+                            :
+                            busData.map((item)=>(
+                                <TouchableOpacity 
+                                    style={styles.card}
+                                    activeOpacity={1}
+                                    onPress={()=>navigation.navigate('TodaysTrip',item)}
+                                    key={item._id}
+                                >
+                                    <BusesCard 
+                                        bus_name={item.name}
+                                        bus_model={item.bus_model}
+                                        total_seat={item.seats.seater+item.seats.sleeper}
+                                    />
+                                </TouchableOpacity>
+                            ))
+                        }                
                     </ScrollView>
                 </View>
             </View>
@@ -67,5 +116,13 @@ const styles = StyleSheet.create({
         left:0,
         backgroundColor:"transparent",
         alignItems:"center"
+    },
+    card: {
+        backgroundColor:"#fff",
+        elevation:9,
+        paddingVertical:10,
+        paddingHorizontal:20,
+        borderRadius:10,
+        marginBottom:10
     },
 })

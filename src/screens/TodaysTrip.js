@@ -8,37 +8,43 @@ import {
 import Background from '../utils/Background';
 import { primary } from '../utils/Color';
 import Header from '../utils/Header';
-import MyCard from '../utils/MyCard';
+import TripCard from '../utils/TripCard';
 
 
-export default function TodaysTrip({navigation}) {
-  return (
-    <View style={styles.container}>
-        <Background 
-            BACKCOLOR={primary}
-            HEIGHT="40%"
-            borderBottomLeftRadius={200}
-            borderBottomRightRadius={200}
-            scaleX={2}
-        />
-        <View style={styles.body}>
-            <Header 
-                isPerson={false}
-                back={()=>navigation.goBack()}
+export default function TodaysTrip({navigation,route}) {
+
+    const preData = route.params;
+
+    return (
+        <View style={styles.container}>
+            <Background 
+                BACKCOLOR={primary}
+                HEIGHT="40%"
+                borderBottomLeftRadius={200}
+                borderBottomRightRadius={200}
+                scaleX={2}
             />
-            <View style={{width:"100%",top:-20}}>
-                <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{paddingHorizontal:20,paddingBottom:150,paddingTop:10}}
-                >
-                    <MyCard 
-                        isSeat={true}
-                    />
-                </ScrollView>
+            <View style={styles.body}>
+                <Header 
+                    isPerson={false}
+                    back={()=>navigation.goBack()}
+                />
+                <View style={{width:"100%",top:-20}}>
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{paddingHorizontal:20,paddingBottom:150,paddingTop:10}}
+                    >
+                        <TripCard 
+                            bus_name={preData.name}
+                            bus_model={preData.bus_model}
+                            total_seat={preData.seats.seater+preData.seats.sleeper}
+                            Seater={preData.seats.seater}
+                        />
+                    </ScrollView>
+                </View>
             </View>
         </View>
-    </View>
-  );
+    );
 }
 
 const styles = StyleSheet.create({
@@ -54,5 +60,13 @@ const styles = StyleSheet.create({
         left:0,
         backgroundColor:"transparent",
         alignItems:"center"
-    }
+    },
+    card: {
+        backgroundColor:"#fff",
+        elevation:9,
+        paddingVertical:10,
+        paddingHorizontal:20,
+        borderRadius:10,
+        marginBottom:10
+    },
 })
