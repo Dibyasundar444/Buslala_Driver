@@ -1,4 +1,4 @@
-import { View, ActivityIndicator } from 'react-native';
+import { View, Image } from 'react-native';
 import React from 'react';
 import { primary } from '../utils/Color';
 
@@ -8,10 +8,25 @@ export default function WelcomeScreen() {
         style={{
             flex:1,
             justifyContent:"center",
-            backgroundColor:primary
+            backgroundColor:primary,
+            alignItems:"center"
         }}
     >
-        <ActivityIndicator size={50} color="#fff" />
+        <View 
+          style={{
+            height: 100,
+            width: "80%"
+          }}
+        >
+          <Image 
+            source={require('../assets/logo.png')}
+            style={{
+              height:"100%",
+              width:"100%",
+              resizeMode:"contain"
+            }}
+          />
+        </View>
     </View>
-  )
+  );
 }

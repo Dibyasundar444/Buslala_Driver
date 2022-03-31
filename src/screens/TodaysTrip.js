@@ -28,6 +28,7 @@ export default function TodaysTrip({navigation,route}) {
                 <Header 
                     isPerson={false}
                     back={()=>navigation.goBack()}
+                    backText="Today's Trip"
                 />
                 <View style={{width:"100%",top:-20}}>
                     <ScrollView

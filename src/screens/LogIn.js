@@ -1,5 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import React, { useState } from 'react';
 import {
   StyleSheet,
@@ -13,6 +11,9 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StackActions } from "@react-navigation/native";
+import axios from 'axios';
 import { BASE_URL } from '../config';
 import { primary, secondary } from '../utils/Color';
 
@@ -41,6 +42,8 @@ export default function LogIn({navigation}){
 
   const LOGIN = () => {
     setLoading1(true);
+    setServerError(false);
+    setUserErrortext('');
     let body = {
       "email": email,
       "password": password
@@ -49,7 +52,9 @@ export default function LogIn({navigation}){
     .then(async resp=>{
       setLoading1(false);
       await AsyncStorage.setItem('user',JSON.stringify(resp.data));
-      navigation.navigate("Buses");
+      navigation.dispatch(
+        StackActions.replace("Buses")
+      );
     })
     .catch(err=>{
       setLoading1(false);

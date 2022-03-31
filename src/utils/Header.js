@@ -1,10 +1,42 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
 import Octicons from 'react-native-vector-icons/Octicons';
 import Feather from 'react-native-vector-icons/Feather';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StackActions } from "@react-navigation/native";
+import { useNavigation } from '@react-navigation/native';
 
-export default function Header({isPerson,account,bell,back}) {
+export default function Header({isPerson,account,back,backText}) {
+
+    const navigation = useNavigation();
+
+    const LOGOUT=async()=>{
+        await AsyncStorage.removeItem('user')
+        .then(()=>{
+            navigation.dispatch(
+                StackActions.replace("LogIn")
+            );
+        })
+        .catch(err=>console.log('logout err:',err))
+    };
+
+    const logout_alert=()=>{
+        Alert.alert(
+            "Logging out!",
+            "Are you sure?",
+            [
+              {
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel"
+              },
+              { text: "OK", onPress: LOGOUT }
+            ]
+        );
+    };
+
+
   return (
     <View style={styles.header}>
         {
@@ -18,20 +50,22 @@ export default function Header({isPerson,account,bell,back}) {
             </TouchableOpacity> 
             :
             <TouchableOpacity
-                style={styles.leftBtn}
+                style={backText ? styles.leftBtn : styles.person}
                 activeOpacity={0.8}
                 onPress={back}
             >
                 <AntDesign name='arrowleft' color="#fff" size={18} />
-                <Text style={{color:"#fff",marginLeft:15,fontSize:13}}>Today's Trip</Text>
+                {
+                    backText && <Text style={{color:"#fff",marginLeft:15,fontSize:13}}>{backText}</Text>
+                }
             </TouchableOpacity>
         }
         <TouchableOpacity
             style={styles.person}
             activeOpacity={0.8}
-            onPress={bell}
+            onPress={logout_alert}
         >
-            <Feather name="bell" color="#fff" size={22} />
+            <AntDesign name="logout" color="#fff" size={22} />
         </TouchableOpacity>
     </View>
   );
@@ -61,5 +95,5 @@ const styles = StyleSheet.create({
         paddingHorizontal:20,
         height:50,
         borderRadius:30
-    }
+    },
 })

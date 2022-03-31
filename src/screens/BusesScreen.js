@@ -7,7 +7,7 @@ import {
     ScrollView,
     ActivityIndicator
 } from "react-native";
-import Octicons from 'react-native-vector-icons/Octicons';
+import { useIsFocused } from '@react-navigation/native';
 import Feather from 'react-native-vector-icons/Feather';
 
 import { fontColor, primary } from "../utils/Color";
@@ -20,19 +20,25 @@ import BusesCard from "../utils/BusesCard";
 
 export default function BusesScreen({navigation}){
 
+    const isFocused = useIsFocused();
+
     const [userData, setUserData] = useState({});
     const [busData, setBusData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [apiError, setApiError] = useState(false);
+    const [totalResponse, setTotalResponse] = useState(null);
 
     useEffect(()=>{
-        getAllBusDetails();
-    },[]);
+        if(isFocused){
+            getAllBusDetails();
+        }
+    },[isFocused]);
 
 
     const getAllBusDetails=async()=>{
         const USER_OBJ = await AsyncStorage.getItem('user');
         const PARSED_OBJ = JSON.parse(USER_OBJ);
+        setTotalResponse(PARSED_OBJ);
         setUserData(PARSED_OBJ.user);
         let axiosConfig = {
             headers:{
@@ -63,8 +69,8 @@ export default function BusesScreen({navigation}){
             <View style={styles.body}>
                 <Header 
                     isPerson={true}
-                    account={()=>navigation.navigate("ProfileScreen")}
-                    bell={()=>navigation.navigate("NotificationPage")}
+                    account={()=>navigation.navigate("ProfileScreen",totalResponse)}
+                    LOGOUT={()=>{}}
                 />
                 <View
                     style={{width:'100%'}}
@@ -75,7 +81,7 @@ export default function BusesScreen({navigation}){
                     >
                         <View style={{marginLeft:20}}>
                             <Text style={{fontSize:22,color:"#fff",letterSpacing:1}}>Hello</Text>
-                            <Text style={{fontSize:26,color:fontColor,letterSpacing:1,textTransform:"capitalize"}}>{userData.name}!</Text>
+                            <Text style={{fontSize:26,color:fontColor,letterSpacing:1}}>{userData.name}!</Text>
                             <Text style={{color:"#fff",marginVertical:10}}>Where are you heading today?</Text>
                         </View>   
                         {
